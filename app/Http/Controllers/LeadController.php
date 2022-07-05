@@ -86,11 +86,31 @@ class LeadController extends Controller
                     $id=$channls;
                     $channels=Channels::find($id);
                     $name=$channels->name;
-                    $totalSum=Lead::SELECT('*')->where('channel_id','=',$id)->get()->count();
-                    $activeSum=Lead::SELECT('*')->where('channel_id','=', $id)->where('status','active')->get()->count();
-                    $deadSum=Lead::SELECT('*')->where('channel_id','=', $id)->where('status','dead')->get()->count();
-                    $completeSum=Lead::SELECT('*')->where('channel_id','=', $id)->where('status','complete')->get()->count();
-                    $newSum=Lead::SELECT('*')->where('channel_id','=', $id)->where('status','new')->get()->count();
+                    // $totalSum=Lead::SELECT('*')->where('channel_id','=',$id)->get()->count();
+                    // $activeSum=Lead::SELECT('*')->where('channel_id','=', $id)->where('status','active')->get()->count();
+                    // $deadSum=Lead::SELECT('*')->where('channel_id','=', $id)->where('status','dead')->get()->count();
+                    // $completeSum=Lead::SELECT('*')->where('channel_id','=', $id)->where('status','complete')->get()->count();
+                    // $newSum=Lead::SELECT('*')->where('channel_id','=', $id)->where('status','new')->get()->count();
+                      
+                    $totalSum=Lead::when($userid,function($query,$userid){
+                        return $query->where('assignee',$userid);
+                    })->where('channel_id','=',$id)->get()->count();
+
+                    $activeSum=Lead::when($userid,function($query,$userid){
+                        return $query->where('assignee',$userid);
+                    })->where('channel_id','=', $id)->where('status','active')->get()->count();
+
+                    $deadSum=Lead::when($userid,function($query,$userid){
+                        return $query->where('assignee',$userid);
+                    })->where('channel_id','=', $id)->where('status','dead')->get()->count();
+
+                    $completeSum=Lead::when($userid,function($query,$userid){
+                        return $query->where('assignee',$userid);
+                    })->where('channel_id','=', $id)->where('status','complete')->get()->count();
+
+                    $newSum=Lead::when($userid,function($query,$userid){
+                        return $query->where('assignee',$userid);
+                    })->where('channel_id','=', $id)->where('status','new')->get()->count();
 
                     $active+= $activeSum;
                     $dead+=$deadSum;
